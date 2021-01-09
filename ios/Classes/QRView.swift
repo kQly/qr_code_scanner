@@ -73,7 +73,7 @@ public class QRView:NSObject,FlutterPlatformView {
             switch(call.method){
                 case "setDimensions":
                     let arguments = call.arguments as! Dictionary<String, Double>
-                    self?.setDimensions(width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0)
+                    self?.setDimensions(width: arguments["width"] ?? 0, height: arguments["height"] ?? 0, scanArea: arguments["scanArea"] ?? 0, offset: arguments["offset"] ?? 0)
                 case "flipCamera":
                     self?.flipCamera()
                 case "toggleFlash":
@@ -90,7 +90,7 @@ public class QRView:NSObject,FlutterPlatformView {
         return previewView
     }
     
-    func setDimensions(width: Double, height: Double, scanArea: Double) -> Void {
+    func setDimensions(width: Double, height: Double, scanArea: Double, offset: Double) -> Void {
         previewView.frame = CGRect(x: 0, y: 0, width: width, height: height)
         let midX = self.view().bounds.midX
         let midY = self.view().bounds.midY
@@ -103,7 +103,7 @@ public class QRView:NSObject,FlutterPlatformView {
             
             if (scanArea != 0) {
                 scanner?.didStartScanningBlock = {
-                    self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2), width: scanArea, height: scanArea)
+                    self.scanner?.scanRect = CGRect(x: Double(midX) - (scanArea / 2), y: Double(midY) - (scanArea / 2) - offset, width: scanArea, height: scanArea)
                 }
             }
 

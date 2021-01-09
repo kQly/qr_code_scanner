@@ -193,7 +193,7 @@ class _CreationParams {
 class QRViewController {
   QRViewController._(int id, GlobalKey qrKey, double scanArea)
       : _channel = MethodChannel('net.touchcapture.qr.flutterqr/qrview_$id') {
-    updateDimensions(qrKey, scanArea: scanArea);
+    updateDimensions(qrKey, scanArea: scanArea, offset: 40);
     _channel.setMethodCallHandler(
       (call) async {
         switch (call.method) {
@@ -246,13 +246,14 @@ class QRViewController {
     _scanUpdateController.close();
   }
 
-  void updateDimensions(GlobalKey key, {double scanArea}) {
+  void updateDimensions(GlobalKey key, {double scanArea, double offset}) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final RenderBox renderBox = key.currentContext.findRenderObject();
       _channel.invokeMethod('setDimensions', {
         'width': renderBox.size.width,
         'height': renderBox.size.height,
-        'scanArea': scanArea ?? 0
+        'scanArea': scanArea ?? 0,
+        'offset': offset ?? 0,
       });
     }
   }
