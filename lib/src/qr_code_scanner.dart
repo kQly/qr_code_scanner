@@ -96,11 +96,13 @@ class QRView extends StatefulWidget {
     @required this.onQRViewCreated,
     this.overlay,
     this.overlayMargin = EdgeInsets.zero,
+    this.boxLineColor = const Color(0xFFE20073),
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
+  final Color boxLineColor;
 
   final ShapeBorder overlay;
   final EdgeInsetsGeometry overlayMargin;
@@ -109,7 +111,95 @@ class QRView extends StatefulWidget {
   State<StatefulWidget> createState() => _QRViewState();
 }
 
-class _QRViewState extends State<QRView> {
+class _QRViewState extends State<QRView> with TickerProviderStateMixin {
+
+  AnimationController _animationController;
+  Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _initAnimation();
+  }
+
+  @override
+  void dispose() {
+    _clearAnimation();
+    super.dispose();
+  }
+
+  void _upState() {
+    setState(() {});
+  }
+
+  void _initAnimation() {
+    setState(() {
+      _animationController = AnimationController(
+          vsync: this, duration: Duration(milliseconds: 1000));
+    });
+    _animationController
+      ..addListener(_upState)
+      ..addStatusListener((state) {
+        if (state == AnimationStatus.completed) {
+          _timer = Timer(Duration(seconds: 1), () {
+            _animationController?.reverse(from: 1.0);
+          });
+        } else if (state == AnimationStatus.dismissed) {
+          _timer = Timer(Duration(seconds: 1), () {
+            _animationController?.forward(from: 0.0);
+          });
+        }
+      });
+    _animationController.forward(from: 0.0);
+  }
+
+  void _clearAnimation() {
+    _timer?.cancel();
+    if (_animationController != null) {
+      _animationController?.dispose();
+      _animationController = null;
+    }
+  }
+
+  List<Widget> _childrenStacks() {
+    if (widget.overlay != null) {
+      return [
+        Container(
+          padding: widget.overlayMargin,
+          decoration: ShapeDecoration(
+            shape: widget.overlay,
+          ),
+        ),
+        Positioned(
+          left: (MediaQuery
+              .of(context)
+              .size
+              .width - 260) / 2.0,
+          top: (MediaQuery
+              .of(context)
+              .size
+              .height - 260) / 2.0 - 40,
+          child: CustomPaint(
+            painter: QrScanBoxPainter(
+              boxLineColor: widget.boxLineColor,
+              animationValue: _animationController?.value ?? 0,
+              isForward:
+              _animationController?.status == AnimationStatus.forward,
+            ),
+            child: SizedBox(
+              width: 260,
+              height: 260,
+            ),
+          ),
+        ),
+      ];
+    } else {
+      return [
+        Container(),
+      ];
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -121,9 +211,31 @@ class _QRViewState extends State<QRView> {
             decoration: ShapeDecoration(
               shape: widget.overlay,
             ),
-          )
-        else
-          Container(),
+          ),
+          Positioned(
+            left: (MediaQuery
+                .of(context)
+                .size
+                .width - 260) / 2.0,
+            top: (MediaQuery
+                .of(context)
+                .size
+                .height - 260) / 2.0 - 40,
+            child: CustomPaint(
+              painter: QrScanBoxPainter(
+                boxLineColor: widget.boxLineColor,
+                animationValue: _animationController?.value ?? 0,
+                isForward:
+                _animationController?.status == AnimationStatus.forward,
+              ),
+              child: SizedBox(
+                width: 260,
+                height: 260,
+              ),
+            ),
+          ),
+        // else
+        //
       ],
     );
   }
@@ -257,4 +369,53 @@ class QRViewController {
       });
     }
   }
+}
+
+
+class QrScanBoxPainter extends CustomPainter {
+  final double animationValue;
+  final bool isForward;
+  final Color boxLineColor;
+
+  QrScanBoxPainter(
+      {@required this.animationValue,
+        @required this.isForward,
+        this.boxLineColor})
+      : assert(animationValue != null),
+        assert(isForward != null);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+
+    canvas.clipRRect(
+        BorderRadius.all(Radius.circular(0)).toRRect(Offset.zero & size));
+
+    final linePaint = Paint();
+    final lineSize = 70.0;
+    final leftPress = (size.height + lineSize) * animationValue - lineSize;
+    linePaint.style = PaintingStyle.fill;
+    linePaint.strokeWidth = lineSize;
+
+    linePaint.shader = LinearGradient(
+      colors: [Color(0x00E20073),Color(0xD6ED4199), Color(0xFFE20073), Color(0xFFE20073)],
+      stops: [0.0, 0.7, 68.0/70.0, 1.0],
+      begin: isForward ? Alignment.topCenter: Alignment.bottomCenter,
+      end: isForward ? Alignment.bottomCenter : Alignment.topCenter
+    ).createShader(Rect.fromLTWH(0, leftPress, size.width, lineSize));
+
+
+    canvas.drawLine(
+      Offset(0, leftPress+lineSize*0.5),
+      Offset(size.width, leftPress+lineSize*0.5),
+      linePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(QrScanBoxPainter oldDelegate) =>
+      animationValue != oldDelegate.animationValue;
+
+  @override
+  bool shouldRebuildSemantics(QrScanBoxPainter oldDelegate) =>
+      animationValue != oldDelegate.animationValue;
 }
