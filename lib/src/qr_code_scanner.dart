@@ -96,13 +96,11 @@ class QRView extends StatefulWidget {
     @required this.onQRViewCreated,
     this.overlay,
     this.overlayMargin = EdgeInsets.zero,
-    this.boxLineColor = const Color(0xFFE20073),
   })  : assert(key != null),
         assert(onQRViewCreated != null),
         super(key: key);
 
   final QRViewCreatedCallback onQRViewCreated;
-  final Color boxLineColor;
 
   final ShapeBorder overlay;
   final EdgeInsetsGeometry overlayMargin;
@@ -161,9 +159,17 @@ class _QRViewState extends State<QRView> with TickerProviderStateMixin {
     }
   }
 
-  List<Widget> _childrenStacks() {
+  List<Widget> _childrenStacks(BuildContext context) {
     if (widget.overlay != null) {
+      double scanSize = 250;
+      double offset = 0;
+      ShapeBorder overlay = widget.overlay;
+      if (overlay is QrScannerOverlayShape) {
+        scanSize = overlay.cutOutSize;
+        offset = overlay.cutOutBottomOffset;
+      }
       return [
+        _getPlatformQrView(widget.key),
         Container(
           padding: widget.overlayMargin,
           decoration: ShapeDecoration(
@@ -174,69 +180,37 @@ class _QRViewState extends State<QRView> with TickerProviderStateMixin {
           left: (MediaQuery
               .of(context)
               .size
-              .width - 260) / 2.0,
+              .width - scanSize) / 2.0,
           top: (MediaQuery
               .of(context)
               .size
-              .height - 260) / 2.0 - 40,
+              .height - scanSize) / 2.0 - offset,
           child: CustomPaint(
             painter: QrScanBoxPainter(
-              boxLineColor: widget.boxLineColor,
               animationValue: _animationController?.value ?? 0,
               isForward:
               _animationController?.status == AnimationStatus.forward,
             ),
             child: SizedBox(
-              width: 260,
-              height: 260,
+              width: scanSize,
+              height: scanSize,
             ),
           ),
         ),
       ];
     } else {
       return [
+        _getPlatformQrView(widget.key),
         Container(),
       ];
     }
   }
+
   
   @override
   Widget build(BuildContext context) {
     return Stack(
-      children: [
-        _getPlatformQrView(widget.key),
-        if (widget.overlay != null)
-          Container(
-            padding: widget.overlayMargin,
-            decoration: ShapeDecoration(
-              shape: widget.overlay,
-            ),
-          ),
-          Positioned(
-            left: (MediaQuery
-                .of(context)
-                .size
-                .width - 260) / 2.0,
-            top: (MediaQuery
-                .of(context)
-                .size
-                .height - 260) / 2.0 - 40,
-            child: CustomPaint(
-              painter: QrScanBoxPainter(
-                boxLineColor: widget.boxLineColor,
-                animationValue: _animationController?.value ?? 0,
-                isForward:
-                _animationController?.status == AnimationStatus.forward,
-              ),
-              child: SizedBox(
-                width: 260,
-                height: 260,
-              ),
-            ),
-          ),
-        // else
-        //
-      ],
+      children:_childrenStacks(context)
     );
   }
 
@@ -375,12 +349,10 @@ class QRViewController {
 class QrScanBoxPainter extends CustomPainter {
   final double animationValue;
   final bool isForward;
-  final Color boxLineColor;
 
   QrScanBoxPainter(
       {@required this.animationValue,
-        @required this.isForward,
-        this.boxLineColor})
+        @required this.isForward})
       : assert(animationValue != null),
         assert(isForward != null);
 
