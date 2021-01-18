@@ -107,49 +107,58 @@ class QrScannerOverlayShape extends ShapeBorder {
         backgroundPaint,
       )
       // Draw top right corner
-      ..drawRRect(
-        RRect.fromLTRBAndCorners(
-          cutOutRect.right - _borderLength,
-          cutOutRect.top,
-          cutOutRect.right,
-          cutOutRect.top + _borderLength,
-          topRight: Radius.circular(borderRadius),
-        ),
-        borderPaint,
-      )
+      ..drawLine(Offset(cutOutRect.right - _borderLength, cutOutRect.top), Offset(cutOutRect.right+borderWidth*0.5, cutOutRect.top), borderPaint)
+      ..drawLine(Offset(cutOutRect.right, cutOutRect.top+borderWidth*0.5), Offset(cutOutRect.right, cutOutRect.top + _borderLength), borderPaint)
+      // ..drawRRect(
+      //   RRect.fromLTRBAndCorners(
+      //     cutOutRect.right - _borderLength,
+      //     cutOutRect.top,
+      //     cutOutRect.right,
+      //     cutOutRect.top + _borderLength,
+      //     topRight: Radius.circular(borderRadius),
+      //   ),
+      //   borderPaint,
+      // )
       // Draw top left corner
-      ..drawRRect(
-        RRect.fromLTRBAndCorners(
-          cutOutRect.left,
-          cutOutRect.top,
-          cutOutRect.left + _borderLength,
-          cutOutRect.top + _borderLength,
-          topLeft: Radius.circular(borderRadius),
-        ),
-        borderPaint,
-      )
+
+      ..drawLine(Offset(cutOutRect.left-borderWidth*0.5, cutOutRect.top), Offset(cutOutRect.left + _borderLength, cutOutRect.top), borderPaint)
+      ..drawLine(Offset(cutOutRect.left, cutOutRect.top+borderWidth*0.5), Offset(cutOutRect.left, cutOutRect.top + _borderLength), borderPaint)
+      // ..drawRRect(
+      //   RRect.fromLTRBAndCorners(
+      //     cutOutRect.left,
+      //     cutOutRect.top,
+      //     cutOutRect.left + _borderLength,
+      //     cutOutRect.top + _borderLength,
+      //     topLeft: Radius.circular(borderRadius),
+      //   ),
+      //   borderPaint,
+      // )
       // Draw bottom right corner
-      ..drawRRect(
-        RRect.fromLTRBAndCorners(
-          cutOutRect.right - _borderLength,
-          cutOutRect.bottom - _borderLength,
-          cutOutRect.right,
-          cutOutRect.bottom,
-          bottomRight: Radius.circular(borderRadius),
-        ),
-        borderPaint,
-      )
+      ..drawLine(Offset(cutOutRect.right - _borderLength, cutOutRect.bottom), Offset(cutOutRect.right+borderWidth*0.5, cutOutRect.bottom), borderPaint)
+      ..drawLine(Offset(cutOutRect.right, cutOutRect.bottom-borderWidth*0.5), Offset(cutOutRect.right, cutOutRect.bottom - _borderLength), borderPaint)
+      // ..drawRRect(
+      //   RRect.fromLTRBAndCorners(
+      //     cutOutRect.right - _borderLength,
+      //     cutOutRect.bottom - _borderLength,
+      //     cutOutRect.right,
+      //     cutOutRect.bottom,
+      //     bottomRight: Radius.circular(borderRadius),
+      //   ),
+      //   borderPaint,
+      // )
       // Draw bottom left corner
-      ..drawRRect(
-        RRect.fromLTRBAndCorners(
-          cutOutRect.left,
-          cutOutRect.bottom - _borderLength,
-          cutOutRect.left + _borderLength,
-          cutOutRect.bottom,
-          bottomLeft: Radius.circular(borderRadius),
-        ),
-        borderPaint,
-      )
+      ..drawLine(Offset(cutOutRect.left - borderWidth*0.5, cutOutRect.bottom), Offset(cutOutRect.left + _borderLength, cutOutRect.bottom), borderPaint)
+      ..drawLine(Offset(cutOutRect.left, cutOutRect.bottom-borderWidth*0.5), Offset(cutOutRect.left, cutOutRect.bottom - _borderLength), borderPaint)
+      // ..drawRRect(
+      //   RRect.fromLTRBAndCorners(
+      //     cutOutRect.left,
+      //     cutOutRect.bottom - _borderLength,
+      //     cutOutRect.left + _borderLength,
+      //     cutOutRect.bottom,
+      //     bottomLeft: Radius.circular(borderRadius),
+      //   ),
+      //   borderPaint,
+      // )
       ..drawRRect(
         RRect.fromRectAndRadius(
           cutOutRect,

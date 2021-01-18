@@ -369,8 +369,8 @@ class QrScanBoxPainter extends CustomPainter {
     linePaint.strokeWidth = lineSize;
 
     linePaint.shader = LinearGradient(
-      colors: [Color(0x00E20073),Color(0xD6ED4199), Color(0xFFE20073), Color(0xFFE20073)],
-      stops: [0.0, 0.7, 68.0/70.0, 1.0],
+      colors: [Color(0x00E20073),Color(0x33ED4199), Color(0x45E20073), Color(0xFFE20073), Color(0xFFE20073)],
+      stops: [0.0, 0.7, 67.0/70.0, 68.0/70.0, 1.0],
       begin: isForward ? Alignment.topCenter: Alignment.bottomCenter,
       end: isForward ? Alignment.bottomCenter : Alignment.topCenter
     ).createShader(Rect.fromLTWH(0, leftPress, size.width, lineSize));
